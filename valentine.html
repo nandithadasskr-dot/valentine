@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine 💖</title>
+<style>
+  body {
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom right, #ffb6c1, #ffc0cb);
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+    text-align: center;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 10;
+  }
+
+  h1 { color: #e60073; }
+
+  button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  #yesBtn { background:#ff4d88; color:white; }
+  #noBtn  { background:#ccc; position:absolute; }
+
+  #result {
+    font-size: 24px;
+    color: green;
+    margin-top: 20px;
+    display: none;
+  }
+
+  .heart, .confetti {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .heart {
+    bottom: -20px;
+    font-size: 20px;
+    animation: floatUp 5s linear infinite;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(1); opacity:1; }
+    100% { transform: translateY(-100vh) scale(1.5); opacity:0; }
+  }
+
+  canvas {
+    position:absolute;
+    top:0; left:0;
+    z-index:1;
+  }
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop>
+  <source src="tere_hawaale.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="fireworks"></canvas>
+
+<div class="container">
+  <h1>Appu, will you be my Valentine? 💌</h1>
+  <button id="yesBtn">Yes 💖</button>
+  <button id="noBtn">No 😅</button>
+  <div id="result">🎉 Congratulations Appu! You are my Valentine! 💕</div>
+</div>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const result = document.getElementById("result");
+const music = document.getElementById("bgMusic");
+
+// No button runs away 😆
+noBtn.addEventListener("mouseover", () => {
+  const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+  const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+});
+
+yesBtn.addEventListener("click", () => {
+  result.style.display = "block";
+  yesBtn.style.display = "none";
+  noBtn.style.display = "none";
+  music.play();
+  startHearts();
+  startConfetti();
+  startFireworks();
+});
+
+// Hearts 💕
+function startHearts() {
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.fontSize = (20 + Math.random()*20) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+  }, 300);
+}
+
+// Confetti 🎉
+function startConfetti() {
+  setInterval(() => {
+    const conf = document.createElement("div");
+    conf.className = "confetti";
+    conf.innerHTML = "🎉";
+    conf.style.left = Math.random()*window.innerWidth+"px";
+    conf.style.top = "-20px";
+    conf.style.fontSize = (15+Math.random()*20)+"px";
+    conf.style.animation = "fall 3s linear forwards";
+    document.body.appendChild(conf);
+    setTimeout(()=>conf.remove(),3000);
+  },200);
+}
+
+const style = document.createElement("style");
+style.innerHTML = `
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); opacity:0; }
+}`;
+document.head.appendChild(style);
+
+// Fireworks 🎆 (Canvas)
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+function startFireworks() {
+  setInterval(() => {
+    const x = Math.random()*canvas.width;
+    const y = Math.random()*canvas.height/2;
+    for(let i=0;i<50;i++){
+      particles.push({
+        x, y,
+        dx:(Math.random()-0.5)*6,
+        dy:(Math.random()-0.5)*6,
+        life:100
+      });
+    }
+  },800);
+}
+
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach((p,i)=>{
+    p.x+=p.dx; p.y+=p.dy; p.life--;
+    ctx.fillStyle="rgba(255,100,200,"+p.life/100+")";
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,3,0,Math.PI*2);
+    ctx.fill();
+    if(p.life<=0) particles.splice(i,1);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
